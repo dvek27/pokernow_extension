@@ -530,6 +530,16 @@
         `;
     }
 
+    function renderNutsBadge(warnings) {
+        if (!warnings || warnings.length !== 0) return '';
+        return `
+          <div class="pn-nuts-badge">
+            <span class="pn-nuts-bang">!</span>
+            <span>you got the nuts big boy</span>
+          </div>
+        `;
+    }
+
     function renderFairShare(winPct, playersPlaying) {
         const fair = 100 / Math.max(1, playersPlaying);
         const edge = winPct - fair;
@@ -556,28 +566,33 @@
         let action = 'CHECK';
         let tone = 'neutral';
         let confidence = 'Medium';
+        let message = 'Small edges, clean decisions.';
         const reasons = [];
 
         if (!postflop) {
             if (cls.tier <= 1 || edge >= 22) {
                 action = 'RAISE';
                 tone = 'raise';
+                message = 'Time to print, but do not get weird.';
                 reasons.push('premium preflop equity');
                 reasons.push(`${edge >= 0 ? '+' : ''}${edge.toFixed(1)}% edge over fair share`);
             } else if (cls.tier === 2 || edge >= 8) {
                 action = 'CALL / SMALL RAISE';
                 tone = 'call';
+                message = 'Good hand, no need to launch fireworks.';
                 reasons.push('playable preflop edge');
                 reasons.push('avoid bloating multiway pots without initiative');
             } else if (edge >= -3) {
                 action = 'CHECK / CALL SMALL';
                 tone = 'call';
+                message = 'Price-sensitive poker. Keep the receipt.';
                 reasons.push('near fair-share equity');
                 reasons.push('continue only at low price');
             } else {
                 action = 'FOLD';
                 tone = 'fold';
                 confidence = 'High';
+                message = 'Let this one go. Future you says thanks.';
                 reasons.push('below fair-share equity');
                 reasons.push('weak ROI versus active players');
             }
@@ -585,33 +600,39 @@
             action = 'RAISE';
             tone = 'raise';
             confidence = 'High';
+            message = 'You brought the hammer. Charge admission.';
             reasons.push('you currently have the nuts');
             reasons.push('maximize value while worse hands can continue');
         } else if (winPct >= 70 && edge >= 25 && topThreat < 18) {
             action = 'RAISE';
             tone = 'raise';
             confidence = 'High';
+            message = 'Value town has open parking.';
             reasons.push('large equity edge');
             reasons.push('low better-hand risk');
         } else if (winPct >= 55 && edge >= 12 && topThreat < 28) {
             action = 'RAISE / CALL';
             tone = 'raise';
+            message = 'Drive the bus, but keep both hands on the wheel.';
             reasons.push('strong value edge');
             reasons.push('keep pressure, but respect heavy action');
         } else if (weightedOuts >= 8 && drawOdds >= 30 && topThreat < 35) {
             action = 'CALL / SEMI-BLUFF';
             tone = 'call';
+            message = 'You have outs. Make the price behave.';
             reasons.push(`${weightedOuts} equity-weighted outs`);
             reasons.push(`${drawOdds}% draw realization estimate`);
         } else if (winPct >= fair - 3 || tiePct >= 12) {
             action = 'CHECK / CALL SMALL';
             tone = 'call';
+            message = 'Do not pay premium rent for a medium view.';
             reasons.push('near break-even equity');
             reasons.push('avoid large pots without a clear edge');
         } else {
             action = 'FOLD';
             tone = 'fold';
             confidence = weightedOuts < 4 ? 'High' : 'Medium';
+            message = 'This is a wallet-preservation exercise.';
             reasons.push(`${edge.toFixed(1)}% below fair share`);
             reasons.push(weightedOuts >= 4 ? 'continue only if price is very cheap' : 'not enough clean equity');
         }
@@ -627,6 +648,7 @@
             confidence,
             fair,
             edge,
+            message,
             reasons: reasons.slice(0, 3)
         };
     }
@@ -634,9 +656,18 @@
     function renderRecommendation(rec, winPct) {
         return `
           <div class="pn-rec-card ${rec.tone}">
-            <div class="pn-rec-kicker">RECOMMENDATION</div>
-            <div class="pn-rec-action">${rec.action}</div>
-            <div class="pn-rec-meta">${rec.confidence} confidence · ${winPct.toFixed(1)}% win · ${rec.edge >= 0 ? '+' : ''}${rec.edge.toFixed(1)}% edge</div>
+            <div class="pn-rec-topline">
+              <div>
+                <div class="pn-rec-kicker">RECOMMENDATION</div>
+                <div class="pn-rec-action">${rec.action}</div>
+              </div>
+              <div class="pn-rec-confidence">${rec.confidence}</div>
+            </div>
+            <div class="pn-rec-message">${rec.message}</div>
+            <div class="pn-rec-stats">
+              <span>${winPct.toFixed(1)}% win</span>
+              <span>${rec.edge >= 0 ? '+' : ''}${rec.edge.toFixed(1)}% edge</span>
+            </div>
           </div>
           <div class="pn-rec-reasons">
             ${rec.reasons.map(reason => `<div class="pn-rec-reason">${reason}</div>`).join('')}
@@ -701,6 +732,7 @@
                       </div>
                       <div class="pn-bar wide"><div class="pn-bar-fill win-fill" style="width:${res.win}%"></div></div>
                       ${renderFairShare(winPct, playersPlaying)}
+                      ${renderNutsBadge(warnings)}
                       ${renderWatchOut(warnings)}
                       ${distHtml}
                     `;

@@ -9,7 +9,7 @@
     top: 20px;
     right: 20px;
     z-index: 999999;
-    width: 250px;
+    width: 252px;
     background: linear-gradient(145deg, #0d1117 0%, #161b22 100%);
     border: 1px solid #30363d;
     border-radius: 12px;
@@ -28,29 +28,32 @@
 .pn-header {
     display: flex;
     align-items: center;
-    padding: 8px 10px;
+    padding: 7px 8px;
     background: rgba(16,185,129,0.08);
     border-bottom: 1px solid #21262d;
-    gap: 6px;
+    gap: 5px;
 }
 
 .pn-logo {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 15px;
+    font-size: 14px;
     color: #10b981;
-    letter-spacing: 1px;
+    letter-spacing: 0.6px;
     flex-shrink: 0;
 }
 
 .pn-tabs {
-    display: flex;
-    gap: 2px;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 3px;
     flex: 1;
+    min-width: 0;
 }
 
 .pn-tab {
-    flex: 1;
-    padding: 3px 0;
+    min-width: 0;
+    height: 20px;
+    padding: 0;
     background: transparent;
     border: 1px solid transparent;
     border-radius: 4px;
@@ -59,8 +62,9 @@
     font-size: 8px;
     font-weight: 600;
     cursor: pointer;
-    letter-spacing: 0.5px;
+    letter-spacing: 0;
     transition: all 0.15s ease;
+    text-align: center;
 }
 
 .pn-tab:hover {
@@ -431,8 +435,34 @@
     color: #9da7b2;
 }
 
+.pn-nuts-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 5px;
+    padding: 2px 5px;
+    border-radius: 999px;
+    background: rgba(245, 158, 11, 0.07);
+    color: #b7c0ca;
+    font-size: 8px;
+    line-height: 1.2;
+}
+
+.pn-nuts-bang {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(245, 158, 11, 0.18);
+    color: #f59e0b;
+    font-weight: 800;
+    font-size: 9px;
+}
+
 .pn-rec-card {
-    padding: 8px;
+    padding: 8px 9px;
     border: 1px solid #30363d;
     border-radius: 7px;
     background: rgba(255,255,255,0.035);
@@ -457,42 +487,76 @@
     font-size: 8px;
     color: #8b949e;
     font-weight: 700;
-    letter-spacing: 1px;
+    letter-spacing: 0.7px;
     margin-bottom: 3px;
+}
+
+.pn-rec-topline {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
 }
 
 .pn-rec-action {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 30px;
+    font-size: 28px;
     line-height: 0.95;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     color: #e6edf3;
+    overflow-wrap: anywhere;
 }
 
 .pn-rec-card.raise .pn-rec-action { color: #10b981; }
 .pn-rec-card.call .pn-rec-action { color: #f59e0b; }
 .pn-rec-card.fold .pn-rec-action { color: #f85149; }
 
-.pn-rec-meta {
-    margin-top: 4px;
-    font-size: 9px;
+.pn-rec-confidence {
+    flex-shrink: 0;
+    padding: 2px 5px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.04);
     color: #9da7b2;
+    font-size: 8px;
+    font-weight: 700;
+}
+
+.pn-rec-message {
+    font-size: 9px;
+    color: #c9d1d9;
     line-height: 1.25;
+    margin-top: 6px;
+}
+
+.pn-rec-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+    margin-top: 7px;
+}
+
+.pn-rec-stats span {
+    padding: 4px 5px;
+    border-radius: 4px;
+    background: rgba(13, 17, 23, 0.45);
+    color: #8b949e;
+    font-size: 8px;
+    line-height: 1.15;
+    text-align: center;
 }
 
 .pn-rec-reasons {
-    margin-top: 7px;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
+    margin-top: 6px;
+    display: grid;
+    gap: 4px;
 }
 
 .pn-rec-reason {
-    padding: 4px 5px;
+    padding: 4px 6px;
     border-radius: 4px;
     background: rgba(255,255,255,0.03);
     color: #c9d1d9;
-    font-size: 9px;
+    font-size: 8.5px;
     line-height: 1.25;
 }
 
