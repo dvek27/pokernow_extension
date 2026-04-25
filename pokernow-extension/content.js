@@ -510,7 +510,7 @@
         const rows = warnings.map(w => `
           <div class="pn-watch-row">
             <div class="pn-watch-hand">${w.label}</div>
-            <div class="pn-watch-note">${w.note}${w.examples?.length ? ` · e.g. ${w.examples.join(', ')}` : ''}</div>
+            <div class="pn-watch-note">${w.probability}% · ${w.note}</div>
           </div>
         `).join('');
         return `
@@ -533,7 +533,7 @@
         const boardHtml = snap.boardCards.map(cardHtml).join('');
         const playersPlaying = snap.playersPlaying || snap.opponents + 1;
         const warnings = snap.boardCards.length >= 3 && typeof possibleBetterHands === 'function'
-            ? possibleBetterHands(snap.holeCards, snap.boardCards)
+            ? possibleBetterHands(snap.holeCards, snap.boardCards, 4, snap.opponents)
             : [];
 
         if (activeTab === 'winpct') {

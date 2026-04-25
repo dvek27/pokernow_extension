@@ -206,13 +206,15 @@ function boardStats(cards) {
     return { suitCounts, rankCounts };
 }
 
-function possibleBetterHands(holeCardsStr, boardCardsStr, limit = 4) {
+function possibleBetterHands(holeCardsStr, boardCardsStr, limit = 4, numOpponents = 1) {
     if (boardCardsStr.length < 3) return [];
     const hole = holeCardsStr.map(cardToInt);
     const board = boardCardsStr.map(cardToInt);
     const heroScore = evaluateHand([...hole, ...board]);
     const heroRank = heroScore >> 24;
     const deck = makeDeck([...hole, ...board]);
+    const totalCombos = deck.length * (deck.length - 1) / 2;
+    const opponents = Math.max(1, numOpponents || 1);
     const better = new Map();
 
     for (let i = 0; i < deck.length; i++) {
@@ -252,6 +254,7 @@ function possibleBetterHands(holeCardsStr, boardCardsStr, limit = 4) {
         .sort((a, b) => b.combos - a.combos || b.rank - a.rank)
         .slice(0, limit)
         .map(item => ({
+            probability: Math.round((1 - Math.pow(1 - item.combos / totalCombos, opponents)) * 100),
             label: item.label,
             combos: item.combos,
             examples: item.examples,
@@ -302,7 +305,7 @@ function calculateOuts(holeCardsStr, boardCardsStr, numOpponents = 1) {
             currentEquity: Math.round(currentEquity * 100),
             cleanCards: '',
             marginalCards: '',
-            warning: possibleBetterHands(holeCardsStr, boardCardsStr)
+            warning: possibleBetterHands(holeCardsStr, boardCardsStr, 4, numOpponents)
         };
     }
     const clean = [];
@@ -354,7 +357,7 @@ function calculateOuts(holeCardsStr, boardCardsStr, numOpponents = 1) {
         currentEquity: Math.round(currentEquity * 100),
         cleanCards: bestClean,
         marginalCards: bestMarginal,
-        warning: possibleBetterHands(holeCardsStr, boardCardsStr)
+        warning: possibleBetterHands(holeCardsStr, boardCardsStr, 4, numOpponents)
     };
 }
 
