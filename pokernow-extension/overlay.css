@@ -345,28 +345,28 @@
 }
 
 .pn-watchout {
-    margin-top: 6px;
-    padding: 5px 6px;
-    border: 1px solid rgba(248, 81, 73, 0.22);
-    border-radius: 6px;
-    background: rgba(248, 81, 73, 0.045);
+    margin-top: 5px;
+    padding: 4px 5px;
+    border: 1px solid rgba(248, 81, 73, 0.14);
+    border-radius: 5px;
+    background: rgba(248, 81, 73, 0.025);
 }
 
 .pn-watch-title {
     font-size: 8px;
-    font-weight: 800;
-    color: #ff7b72;
-    letter-spacing: 0.8px;
-    margin-bottom: 3px;
+    font-weight: 700;
+    color: #e5534b;
+    letter-spacing: 0.6px;
+    margin-bottom: 2px;
 }
 
 .pn-watch-row {
     display: grid;
-    grid-template-columns: 56px 1fr;
-    gap: 5px;
+    grid-template-columns: 52px 1fr;
+    gap: 4px;
     align-items: start;
-    padding: 2px 0;
-    border-top: 1px solid rgba(248, 81, 73, 0.1);
+    padding: 1px 0;
+    border-top: 1px solid rgba(248, 81, 73, 0.07);
 }
 
 .pn-watch-row:first-of-type {
@@ -374,15 +374,15 @@
 }
 
 .pn-watch-hand {
-    font-size: 9px;
+    font-size: 8px;
     font-weight: 700;
-    color: #ffa198;
+    color: #e97970;
 }
 
 .pn-watch-note {
     font-size: 8px;
-    line-height: 1.25;
-    color: #b7c0ca;
+    line-height: 1.2;
+    color: #9da7b2;
     overflow-wrap: anywhere;
 }
 

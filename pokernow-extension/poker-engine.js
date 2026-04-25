@@ -249,7 +249,7 @@ function possibleBetterHands(holeCardsStr, boardCardsStr, limit = 4) {
     }
 
     return Array.from(better.values())
-        .sort((a, b) => b.rank - a.rank || b.combos - a.combos)
+        .sort((a, b) => b.combos - a.combos || b.rank - a.rank)
         .slice(0, limit)
         .map(item => ({
             label: item.label,
