@@ -424,6 +424,7 @@
                 <button class="pn-tab active" data-tab="winpct">WIN%</button>
                 <button class="pn-tab" data-tab="preflop">PRE</button>
                 <button class="pn-tab" data-tab="outs">OUTS</button>
+                <button class="pn-tab" data-tab="recommend">REC</button>
               </div>
               <button class="pn-close" title="Hide">×</button>
             </div>
@@ -541,6 +542,109 @@
         `;
     }
 
+    function buildRecommendation({ snap, winPct, tiePct, warnings, outs }) {
+        const playersPlaying = snap.playersPlaying || snap.opponents + 1;
+        const fair = 100 / Math.max(1, playersPlaying);
+        const edge = winPct - fair;
+        const postflop = snap.boardCards.length >= 3;
+        const nuts = postflop && warnings && warnings.length === 0;
+        const topThreat = warnings && warnings.length ? warnings[0].probability : 0;
+        const weightedOuts = outs?.weightedOuts || 0;
+        const drawOdds = outs?.approxOdds || 0;
+        const cls = classifyPreflopHand(snap.holeCards[0], snap.holeCards[1]);
+
+        let action = 'CHECK';
+        let tone = 'neutral';
+        let confidence = 'Medium';
+        const reasons = [];
+
+        if (!postflop) {
+            if (cls.tier <= 1 || edge >= 22) {
+                action = 'RAISE';
+                tone = 'raise';
+                reasons.push('premium preflop equity');
+                reasons.push(`${edge >= 0 ? '+' : ''}${edge.toFixed(1)}% edge over fair share`);
+            } else if (cls.tier === 2 || edge >= 8) {
+                action = 'CALL / SMALL RAISE';
+                tone = 'call';
+                reasons.push('playable preflop edge');
+                reasons.push('avoid bloating multiway pots without initiative');
+            } else if (edge >= -3) {
+                action = 'CHECK / CALL SMALL';
+                tone = 'call';
+                reasons.push('near fair-share equity');
+                reasons.push('continue only at low price');
+            } else {
+                action = 'FOLD';
+                tone = 'fold';
+                confidence = 'High';
+                reasons.push('below fair-share equity');
+                reasons.push('weak ROI versus active players');
+            }
+        } else if (nuts) {
+            action = 'RAISE';
+            tone = 'raise';
+            confidence = 'High';
+            reasons.push('you currently have the nuts');
+            reasons.push('maximize value while worse hands can continue');
+        } else if (winPct >= 70 && edge >= 25 && topThreat < 18) {
+            action = 'RAISE';
+            tone = 'raise';
+            confidence = 'High';
+            reasons.push('large equity edge');
+            reasons.push('low better-hand risk');
+        } else if (winPct >= 55 && edge >= 12 && topThreat < 28) {
+            action = 'RAISE / CALL';
+            tone = 'raise';
+            reasons.push('strong value edge');
+            reasons.push('keep pressure, but respect heavy action');
+        } else if (weightedOuts >= 8 && drawOdds >= 30 && topThreat < 35) {
+            action = 'CALL / SEMI-BLUFF';
+            tone = 'call';
+            reasons.push(`${weightedOuts} equity-weighted outs`);
+            reasons.push(`${drawOdds}% draw realization estimate`);
+        } else if (winPct >= fair - 3 || tiePct >= 12) {
+            action = 'CHECK / CALL SMALL';
+            tone = 'call';
+            reasons.push('near break-even equity');
+            reasons.push('avoid large pots without a clear edge');
+        } else {
+            action = 'FOLD';
+            tone = 'fold';
+            confidence = weightedOuts < 4 ? 'High' : 'Medium';
+            reasons.push(`${edge.toFixed(1)}% below fair share`);
+            reasons.push(weightedOuts >= 4 ? 'continue only if price is very cheap' : 'not enough clean equity');
+        }
+
+        if (topThreat >= 30 && tone !== 'fold' && !nuts) {
+            reasons.push(`${topThreat}% top better-hand risk`);
+            if (tone === 'raise') action = action === 'RAISE' ? 'CALL / POT CONTROL' : action;
+        }
+
+        return {
+            action,
+            tone,
+            confidence,
+            fair,
+            edge,
+            reasons: reasons.slice(0, 3)
+        };
+    }
+
+    function renderRecommendation(rec, winPct) {
+        return `
+          <div class="pn-rec-card ${rec.tone}">
+            <div class="pn-rec-kicker">RECOMMENDATION</div>
+            <div class="pn-rec-action">${rec.action}</div>
+            <div class="pn-rec-meta">${rec.confidence} confidence · ${winPct.toFixed(1)}% win · ${rec.edge >= 0 ? '+' : ''}${rec.edge.toFixed(1)}% edge</div>
+          </div>
+          <div class="pn-rec-reasons">
+            ${rec.reasons.map(reason => `<div class="pn-rec-reason">${reason}</div>`).join('')}
+          </div>
+          <div class="pn-rec-note">Heuristic only: pot odds, stack depth, position, and betting history can change the best action.</div>
+        `;
+    }
+
     function renderOverlay(snap) {
         if (!overlayEl) return;
         const body = overlayEl.querySelector('#pn-body');
@@ -655,6 +759,37 @@
               </div>
               ${renderWatchOut(o.warning || warnings)}
             `;
+        }
+        else if (activeTab === 'recommend') {
+            body.innerHTML = `
+              <div class="pn-cards-row">${holeHtml}</div>
+              ${snap.boardCards.length ? `<div class="pn-cards-row">${boardHtml}</div>` : ''}
+              <div class="pn-street-badge">${streetName(snap.boardCards.length)} · ${playersPlaying} PLAYING</div>
+              <div class="pn-calculating"><span class="pn-spinner"></span>building recommendation...</div>
+            `;
+
+            setTimeout(() => {
+                if (!overlayEl) return;
+                try {
+                    const res = simulateOdds(snap.holeCards, snap.boardCards, snap.opponents, 4000);
+                    const winPct = parseFloat(res.win);
+                    const tiePct = parseFloat(res.tie);
+                    const outs = snap.boardCards.length >= 3
+                        ? calculateOuts(snap.holeCards, snap.boardCards, snap.opponents)
+                        : null;
+                    const rec = buildRecommendation({ snap, winPct, tiePct, warnings, outs });
+                    body.innerHTML = `
+                      <div class="pn-cards-row">${holeHtml}</div>
+                      ${snap.boardCards.length ? `<div class="pn-cards-row">${boardHtml}</div>` : ''}
+                      <div class="pn-street-badge">${streetName(snap.boardCards.length)} · ${playersPlaying} PLAYING</div>
+                      ${renderRecommendation(rec, winPct)}
+                      ${renderFairShare(winPct, playersPlaying)}
+                      ${renderWatchOut(warnings)}
+                    `;
+                } catch (err) {
+                    body.innerHTML = `<div class="pn-error">Recommendation Error</div>`;
+                }
+            }, 10);
         }
     }
 
