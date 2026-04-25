@@ -1,0 +1,503 @@
+/* ============================================================
+   overlay.css — PokerNow Odds Overlay Styles
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Bebas+Neue&display=swap');
+
+#pn-odds-overlay {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 999999;
+    width: 240px;
+    background: linear-gradient(145deg, #0d1117 0%, #161b22 100%);
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    box-shadow:
+            0 0 0 1px rgba(255,255,255,0.05),
+            0 8px 32px rgba(0,0,0,0.6),
+            0 0 20px rgba(16,185,129,0.08);
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    color: #e6edf3;
+    font-size: 12px;
+    overflow: hidden;
+    user-select: none;
+}
+
+/* Header */
+.pn-header {
+    display: flex;
+    align-items: center;
+    padding: 8px 10px;
+    background: rgba(16,185,129,0.08);
+    border-bottom: 1px solid #21262d;
+    gap: 6px;
+}
+
+.pn-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    color: #10b981;
+    letter-spacing: 1px;
+    flex-shrink: 0;
+}
+
+.pn-tabs {
+    display: flex;
+    gap: 2px;
+    flex: 1;
+}
+
+.pn-tab {
+    flex: 1;
+    padding: 3px 0;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: #6e7681;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: all 0.15s ease;
+}
+
+.pn-tab:hover {
+    color: #e6edf3;
+    background: rgba(255,255,255,0.05);
+}
+
+.pn-tab.active {
+    color: #10b981;
+    border-color: rgba(16,185,129,0.4);
+    background: rgba(16,185,129,0.1);
+}
+
+.pn-close {
+    width: 18px;
+    height: 18px;
+    background: transparent;
+    border: none;
+    color: #6e7681;
+    cursor: pointer;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    flex-shrink: 0;
+    transition: all 0.15s;
+}
+
+.pn-close:hover {
+    background: rgba(248,81,73,0.2);
+    color: #f85149;
+}
+
+/* Body */
+.pn-body {
+    padding: 10px;
+    min-height: 120px;
+}
+
+/* Cards row */
+.pn-cards-row {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
+
+.pn-card {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    padding: 3px 5px;
+    background: #1c2128;
+    border: 1px solid #30363d;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    transition: transform 0.15s;
+}
+
+.pn-card.red { color: #f85149; }
+.pn-card.black { color: #e6edf3; }
+
+/* Street badge */
+.pn-street-badge {
+    font-size: 9px;
+    color: #6e7681;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+/* Odds grid */
+.pn-odds-grid {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.pn-odds-cell {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.pn-odds-pct {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    line-height: 1;
+    letter-spacing: 0.5px;
+}
+
+.pn-odds-cell.win .pn-odds-pct { color: #10b981; }
+.pn-odds-cell.tie .pn-odds-pct { color: #f59e0b; }
+.pn-odds-cell.lose .pn-odds-pct { color: #f85149; }
+
+.pn-odds-label {
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    color: #6e7681;
+    font-weight: 700;
+}
+
+/* Bars */
+.pn-bar {
+    width: 100%;
+    height: 3px;
+    background: #21262d;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.pn-bar.wide {
+    height: 6px;
+    margin-top: 6px;
+}
+
+.pn-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.win-fill { background: linear-gradient(90deg, #059669, #10b981); }
+.tie-fill { background: linear-gradient(90deg, #d97706, #f59e0b); }
+.lose-fill { background: linear-gradient(90deg, #dc2626, #f85149); }
+.preflop-fill { transition: width 0.5s cubic-bezier(0.4,0,0.2,1); }
+
+.pn-sim-note {
+    font-size: 8px;
+    color: #484f58;
+    text-align: right;
+    margin-top: 4px;
+    letter-spacing: 0.3px;
+}
+
+/* Preflop tab */
+.pn-hand-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+    line-height: 1;
+}
+
+.pn-tier-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 10px;
+}
+
+.pn-tier-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #21262d;
+    border: 1px solid #30363d;
+    transition: background 0.3s;
+}
+
+.pn-tier-dot.filled {
+    border-color: transparent;
+}
+
+.pn-tier-text {
+    font-size: 9px;
+    color: #6e7681;
+    margin-left: 2px;
+    letter-spacing: 0.5px;
+}
+
+.pn-equity-block {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid #21262d;
+    border-radius: 8px;
+    padding: 8px;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.pn-equity-pct {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    line-height: 1;
+    letter-spacing: 1px;
+    color: #e6edf3;
+}
+
+.pn-equity-sub {
+    font-size: 9px;
+    color: #6e7681;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+}
+
+.pn-preflop-tips {
+    font-size: 10px;
+    line-height: 1.4;
+}
+
+.tip-green { color: #10b981; }
+.tip-yellow { color: #f59e0b; }
+.tip-red { color: #f85149; }
+
+/* Outs tab */
+.pn-outs-main {
+    text-align: center;
+    margin: 4px 0 10px;
+}
+
+.pn-outs-count {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    line-height: 1;
+    color: #10b981;
+    letter-spacing: 2px;
+}
+
+.pn-outs-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: #6e7681;
+    font-weight: 700;
+}
+
+.pn-outs-detail {
+    text-align: center;
+    font-size: 10px;
+    color: #8b949e;
+    margin: 4px 0;
+}
+
+.pn-outs-cards {
+    text-align: center;
+    font-size: 9px;
+    color: #c9d1d9;
+    margin: 2px 0;
+    overflow-wrap: anywhere;
+}
+
+.pn-rule-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.pn-rule-item {
+    flex: 1;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid #21262d;
+    border-radius: 6px;
+    padding: 6px;
+    text-align: center;
+}
+
+.pn-rule-pct {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    color: #f59e0b;
+    line-height: 1;
+}
+
+.pn-rule-sub {
+    font-size: 8px;
+    color: #6e7681;
+    letter-spacing: 0.5px;
+}
+
+.pn-pot-odds-note {
+    font-size: 9px;
+    color: #6e7681;
+    text-align: center;
+    padding: 4px;
+    border-top: 1px solid #21262d;
+    margin-top: 4px;
+}
+
+.pn-watchout {
+    margin-top: 6px;
+    padding: 5px 6px;
+    border: 1px solid rgba(248, 81, 73, 0.22);
+    border-radius: 6px;
+    background: rgba(248, 81, 73, 0.045);
+}
+
+.pn-watch-title {
+    font-size: 8px;
+    font-weight: 800;
+    color: #ff7b72;
+    letter-spacing: 0.8px;
+    margin-bottom: 3px;
+}
+
+.pn-watch-row {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 5px;
+    align-items: start;
+    padding: 2px 0;
+    border-top: 1px solid rgba(248, 81, 73, 0.1);
+}
+
+.pn-watch-row:first-of-type {
+    border-top: 0;
+}
+
+.pn-watch-hand {
+    font-size: 9px;
+    font-weight: 700;
+    color: #ffa198;
+}
+
+.pn-watch-note {
+    font-size: 8px;
+    line-height: 1.25;
+    color: #b7c0ca;
+    overflow-wrap: anywhere;
+}
+
+/* States */
+.pn-waiting {
+    text-align: center;
+    color: #484f58;
+    font-size: 11px;
+    padding: 20px 0;
+    letter-spacing: 0.5px;
+}
+
+.pn-calculating {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: #6e7681;
+    font-size: 10px;
+    padding: 20px 0;
+}
+
+.pn-spinner {
+    width: 12px;
+    height: 12px;
+    border: 2px solid #21262d;
+    border-top-color: #10b981;
+    border-radius: 50%;
+    animation: pn-spin 0.6s linear infinite;
+    display: inline-block;
+}
+
+@keyframes pn-spin {
+    to { transform: rotate(360deg); }
+}
+
+.pn-error {
+    text-align: center;
+    color: #f85149;
+    font-size: 10px;
+    padding: 16px 0;
+}
+
+/* Drag handle */
+.pn-drag-handle {
+    text-align: center;
+    padding: 4px;
+    font-size: 8px;
+    color: #30363d;
+    cursor: move;
+    letter-spacing: 1px;
+    border-top: 1px solid #21262d;
+    transition: color 0.15s;
+}
+
+.pn-drag-handle:hover {
+    color: #6e7681;
+}
+
+/* Hand Distribution Table */
+.pn-dist-table {
+    width: 100%;
+    margin-top: 12px;
+    border-top: 1px solid #21262d;
+    padding-top: 8px;
+}
+
+.pn-dist-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    padding: 2px 0;
+    color: #8b949e;
+}
+
+.pn-dist-val {
+    color: #c9d1d9;
+    font-weight: 600;
+}
+
+/* Strength Meter (Preflop) */
+.pn-strength-meter {
+    height: 6px;
+    background: #21262d;
+    border-radius: 3px;
+    margin: 10px 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.pn-strength-fill {
+    height: 100%;
+    transition: width 0.4s ease-out;
+}
+
+/* Outs Tab Improvements */
+.pn-outs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.pn-outs-card {
+    background: rgba(16, 185, 129, 0.05);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 6px;
+    padding: 8px;
+    text-align: center;
+}
+
+.pn-draw-type {
+    font-size: 9px;
+    color: #10b981;
+    text-transform: uppercase;
+    font-weight: 800;
+    margin-bottom: 4px;
+}

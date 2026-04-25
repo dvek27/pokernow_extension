@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PokerNow Odds</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #0d1117;
+            --surface: #161b22;
+            --border: #30363d;
+            --green: #10b981;
+            --yellow: #f59e0b;
+            --red: #f85149;
+            --text: #e6edf3;
+            --muted: #6e7681;
+            --dim: #21262d;
+        }
+
+        body {
+            width: 300px;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px 10px;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(135deg, rgba(16,185,129,0.1) 0%, transparent 60%);
+        }
+
+        .logo {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+        }
+
+        .logo-symbol {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 28px;
+            color: var(--green);
+            line-height: 1;
+            text-shadow: 0 0 20px rgba(16,185,129,0.4);
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 16px;
+            letter-spacing: 2px;
+            color: var(--text);
+            line-height: 1;
+        }
+
+        .logo-sub {
+            font-size: 8px;
+            color: var(--muted);
+            letter-spacing: 1.5px;
+        }
+
+        /* Toggle switch */
+        .toggle-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toggle-label {
+            font-size: 9px;
+            color: var(--muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .toggle {
+            position: relative;
+            width: 36px;
+            height: 20px;
+        }
+
+        .toggle input { opacity: 0; width: 0; height: 0; }
+
+        .toggle-slider {
+            position: absolute;
+            inset: 0;
+            background: var(--dim);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border: 1px solid var(--border);
+        }
+
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            left: 2px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--muted);
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .toggle input:checked + .toggle-slider { background: rgba(16,185,129,0.3); border-color: var(--green); }
+        .toggle input:checked + .toggle-slider::before { transform: translate(16px, -50%); background: var(--green); }
+
+        /* Status */
+        .status-bar {
+            padding: 8px 16px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--muted);
+            flex-shrink: 0;
+            transition: background 0.3s;
+        }
+
+        .status-dot.active { background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse 2s ease-in-out infinite; }
+        .status-dot.inactive { background: var(--red); }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .status-text {
+            font-size: 10px;
+            color: var(--muted);
+            letter-spacing: 0.5px;
+        }
+
+        /* Tabs */
+        .tab-nav {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 8px 0;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: var(--muted);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.15s;
+            margin-bottom: -1px;
+        }
+
+        .tab-btn:hover { color: var(--text); }
+        .tab-btn.active { color: var(--green); border-bottom-color: var(--green); }
+
+        /* Panels */
+        .panel { display: none; padding: 14px 16px; }
+        .panel.active { display: block; }
+
+        /* Manual input */
+        .section-title {
+            font-size: 9px;
+            color: var(--muted);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .card-inputs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .card-input-wrap {
+            flex: 1;
+        }
+
+        .card-input-wrap label {
+            display: block;
+            font-size: 8px;
+            color: var(--muted);
+            letter-spacing: 1px;
+            margin-bottom: 3px;
+        }
+
+        .card-input {
+            width: 100%;
+            padding: 6px 8px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            font-weight: 700;
+            text-align: center;
+            text-transform: uppercase;
+            transition: border-color 0.15s;
+            outline: none;
+        }
+
+        .card-input:focus { border-color: var(--green); }
+        .card-input.valid { border-color: rgba(16,185,129,0.5); color: var(--green); }
+        .card-input.red-card { color: var(--red); }
+
+        .player-count-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .player-count-row label {
+            font-size: 9px;
+            color: var(--muted);
+            letter-spacing: 1px;
+            flex: 1;
+        }
+
+        .count-control {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .count-btn {
+            width: 22px;
+            height: 22px;
+            background: var(--dim);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--text);
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            transition: all 0.15s;
+        }
+
+        .count-btn:hover { background: var(--border); }
+
+        .count-val {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 20px;
+            color: var(--text);
+            min-width: 20px;
+            text-align: center;
+            line-height: 1;
+        }
+
+        .board-inputs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .board-inputs .card-input-wrap {
+            flex: 0 0 calc(20% - 4px);
+        }
+
+        .calc-btn {
+            width: 100%;
+            padding: 9px;
+            background: linear-gradient(135deg, #059669, #10b981);
+            border: none;
+            border-radius: 7px;
+            color: #fff;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 16px;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .calc-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+        .calc-btn:active { transform: translateY(0); }
+
+        /* Results */
+        #results {
+            margin-top: 12px;
+        }
+
+        .result-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 12px;
+        }
+
+        .result-hand-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .result-hand-label {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        .result-street {
+            font-size: 8px;
+            color: var(--muted);
+            letter-spacing: 1px;
+        }
+
+        .result-odds-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .result-odds-item {
+            flex: 1;
+            text-align: center;
+        }
+
+        .result-pct {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 24px;
+            line-height: 1;
+        }
+
+        .result-lbl {
+            font-size: 7px;
+            letter-spacing: 1.5px;
+            color: var(--muted);
+            font-weight: 700;
+        }
+
+        .c-win { color: var(--green); }
+        .c-tie { color: var(--yellow); }
+        .c-lose { color: var(--red); }
+
+        .result-bar-track {
+            height: 4px;
+            background: var(--dim);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .result-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, var(--green), #34d399);
+            transition: width 0.5s ease;
+        }
+
+        /* About panel */
+        .about-section {
+            margin-bottom: 14px;
+        }
+
+        .feature-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .feature-item {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+
+        .feature-icon {
+            font-size: 14px;
+            flex-shrink: 0;
+            margin-top: -1px;
+        }
+
+        .feature-text {
+            font-size: 10px;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .feature-text strong { color: var(--text); font-weight: 600; }
+
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 12px 0;
+        }
+
+        .version-info {
+            text-align: center;
+            font-size: 9px;
+            color: var(--dim);
+            letter-spacing: 1px;
+        }
+
+        /* Spinner */
+        .spin {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid var(--dim);
+            border-top-color: var(--green);
+            border-radius: 50%;
+            animation: s 0.6s linear infinite;
+            vertical-align: middle;
+            margin-right: 4px;
+        }
+        @keyframes s { to { transform: rotate(360deg); } }
+
+        .empty-state {
+            text-align: center;
+            padding: 20px;
+            color: var(--muted);
+            font-size: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Card display row */
+        .mini-card {
+            display: inline-flex;
+            align-items: center;
+            min-width: 26px;
+            padding: 2px 5px;
+            background: var(--dim);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .mini-card.red { color: var(--red); }
+        .mini-card.black { color: var(--text); }
+    </style>
+</head>
+<body>
+<div class="header">
+    <div class="logo">
+        <span class="logo-symbol">♠</span>
+        <div class="logo-text">
+            <span class="logo-title">POKERNOW</span>
+            <span class="logo-sub">ODDS CALCULATOR</span>
+        </div>
+    </div>
+    <div class="toggle-wrap">
+        <span class="toggle-label">HUD</span>
+        <label class="toggle">
+            <input type="checkbox" id="masterToggle">
+            <span class="toggle-slider"></span>
+        </label>
+    </div>
+</div>
+
+<div class="status-bar">
+    <div class="status-dot" id="statusDot"></div>
+    <span class="status-text" id="statusText">Checking page...</span>
+</div>
+
+<div class="tab-nav">
+    <button class="tab-btn active" data-panel="manual">Manual</button>
+    <button class="tab-btn" data-panel="live">Live HUD</button>
+    <button class="tab-btn" data-panel="about">Guide</button>
+</div>
+
+<!-- Manual Calculator Panel -->
+<div class="panel active" id="panel-manual">
+    <div class="section-title">Your Hole Cards</div>
+    <div class="card-inputs">
+        <div class="card-input-wrap">
+            <label>Card 1</label>
+            <input class="card-input" id="hole1" placeholder="Ah" maxlength="3">
+        </div>
+        <div class="card-input-wrap">
+            <label>Card 2</label>
+            <input class="card-input" id="hole2" placeholder="Kd" maxlength="3">
+        </div>
+    </div>
+
+    <div class="section-title">Board (optional)</div>
+    <div class="board-inputs">
+        <div class="card-input-wrap"><label>F1</label><input class="card-input board-card" placeholder="—" maxlength="3"></div>
+        <div class="card-input-wrap"><label>F2</label><input class="card-input board-card" placeholder="—" maxlength="3"></div>
+        <div class="card-input-wrap"><label>F3</label><input class="card-input board-card" placeholder="—" maxlength="3"></div>
+        <div class="card-input-wrap"><label>Tn</label><input class="card-input board-card" placeholder="—" maxlength="3"></div>
+        <div class="card-input-wrap"><label>Rv</label><input class="card-input board-card" placeholder="—" maxlength="3"></div>
+    </div>
+
+    <div class="player-count-row">
+        <label>Opponents</label>
+        <div class="count-control">
+            <button class="count-btn" id="decOpponents">−</button>
+            <span class="count-val" id="opponentCount">1</span>
+            <button class="count-btn" id="incOpponents">+</button>
+        </div>
+    </div>
+
+    <button class="calc-btn" id="calcBtn">CALCULATE ODDS</button>
+
+    <div id="results"></div>
+</div>
+
+<!-- Live HUD Panel -->
+<div class="panel" id="panel-live">
+    <div id="liveData">
+        <div class="empty-state">Navigate to pokernow.club<br>to see live data</div>
+    </div>
+    <button id="diagnoseBtn" style="margin-top:12px;width:100%;padding:7px;background:var(--dim);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;cursor:pointer;text-transform:uppercase;">Diagnose DOM</button>
+    <pre id="diagOut" style="display:none;margin-top:8px;padding:8px;background:#000;border:1px solid var(--border);border-radius:6px;color:#10b981;font-size:9px;line-height:1.4;max-height:240px;overflow:auto;white-space:pre-wrap;word-break:break-all;"></pre>
+</div>
+
+<!-- About Panel -->
+<div class="panel" id="panel-about">
+    <div class="about-section">
+        <div class="section-title">Features</div>
+        <div class="feature-list">
+            <div class="feature-item">
+                <span class="feature-icon">🎯</span>
+                <span class="feature-text"><strong>Win Probability</strong> — Monte Carlo simulation across thousands of hands for accurate win/tie/lose %</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">🃏</span>
+                <span class="feature-text"><strong>Preflop Analysis</strong> — Hand tier classification, equity vs N opponents, play recommendations</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">🔢</span>
+                <span class="feature-text"><strong>Outs Calculator</strong> — Post-flop outs count with Rule of 2 & 4 approximation</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">📊</span>
+                <span class="feature-text"><strong>Live HUD</strong> — Draggable overlay on PokerNow.club that auto-reads your cards</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="about-section">
+        <div class="section-title">Card Format</div>
+        <div class="feature-text" style="line-height:2">
+            Rank: <strong>2-9, T, J, Q, K, A</strong><br>
+            Suit: <strong>s</strong>(♠) <strong>h</strong>(♥) <strong>d</strong>(♦) <strong>c</strong>(♣)<br>
+            Example: <strong>Ah Kd Ts 2c</strong>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="version-info">v1.0.0 · PokerNow Odds Calculator</div>
+</div>
+
+<script src="popup.js"></script>
+</body>
+</html>
