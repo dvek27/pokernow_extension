@@ -506,7 +506,15 @@
     }
 
     function renderWatchOut(warnings) {
-        if (!warnings || warnings.length === 0) return '';
+        if (!warnings) return '';
+        if (warnings.length === 0) {
+            return `
+              <div class="pn-nuts">
+                <div class="pn-nuts-title">NUTS</div>
+                <div class="pn-nuts-note">No possible opponent hand beats yours right now.</div>
+              </div>
+            `;
+        }
         const rows = warnings.map(w => `
           <div class="pn-watch-row">
             <div class="pn-watch-hand">${w.label}</div>
@@ -517,6 +525,18 @@
           <div class="pn-watchout">
             <div class="pn-watch-title">WATCH OUT</div>
             ${rows}
+          </div>
+        `;
+    }
+
+    function renderFairShare(winPct, playersPlaying) {
+        const fair = 100 / Math.max(1, playersPlaying);
+        const edge = winPct - fair;
+        const edgeText = `${edge >= 0 ? '+' : ''}${edge.toFixed(1)}%`;
+        return `
+          <div class="pn-fair-share ${edge >= 0 ? 'positive' : 'negative'}">
+            <span>${winPct.toFixed(1)}% vs ${fair.toFixed(1)}% fair share</span>
+            <strong>${edgeText} edge</strong>
           </div>
         `;
     }
@@ -534,7 +554,7 @@
         const playersPlaying = snap.playersPlaying || snap.opponents + 1;
         const warnings = snap.boardCards.length >= 3 && typeof possibleBetterHands === 'function'
             ? possibleBetterHands(snap.holeCards, snap.boardCards, 4, snap.opponents)
-            : [];
+            : null;
 
         if (activeTab === 'winpct') {
             body.innerHTML = `
@@ -549,6 +569,7 @@
                 if (!overlayEl) return;
                 try {
                     const res = simulateOdds(snap.holeCards, snap.boardCards, snap.opponents, 5000);
+                    const winPct = parseFloat(res.win);
 
                     let distHtml = '<div class="pn-dist-table">';
                     Object.entries(res.handDist).reverse().forEach(([name, pct]) => {
@@ -575,6 +596,7 @@
                         </div>
                       </div>
                       <div class="pn-bar wide"><div class="pn-bar-fill win-fill" style="width:${res.win}%"></div></div>
+                      ${renderFairShare(winPct, playersPlaying)}
                       ${renderWatchOut(warnings)}
                       ${distHtml}
                     `;

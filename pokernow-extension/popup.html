@@ -379,6 +379,24 @@
             transition: width 0.5s ease;
         }
 
+        .result-fair-share {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin-top: 7px;
+            font-size: 9px;
+            color: var(--muted);
+            line-height: 1.2;
+        }
+
+        .result-fair-share strong {
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .result-fair-share.positive strong { color: var(--green); }
+        .result-fair-share.negative strong { color: var(--red); }
+
         /* About panel */
         .about-section {
             margin-bottom: 14px;

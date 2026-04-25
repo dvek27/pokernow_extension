@@ -202,6 +202,29 @@
     letter-spacing: 0.3px;
 }
 
+.pn-fair-share {
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+    margin-top: 5px;
+    font-size: 9px;
+    color: #8b949e;
+    line-height: 1.2;
+}
+
+.pn-fair-share strong {
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.pn-fair-share.positive strong {
+    color: #10b981;
+}
+
+.pn-fair-share.negative strong {
+    color: #f85149;
+}
+
 /* Preflop tab */
 .pn-hand-label {
     font-family: 'Bebas Neue', sans-serif;
@@ -384,6 +407,28 @@
     line-height: 1.2;
     color: #9da7b2;
     overflow-wrap: anywhere;
+}
+
+.pn-nuts {
+    margin-top: 5px;
+    padding: 4px 5px;
+    border: 1px solid rgba(16, 185, 129, 0.16);
+    border-radius: 5px;
+    background: rgba(16, 185, 129, 0.03);
+}
+
+.pn-nuts-title {
+    font-size: 8px;
+    font-weight: 700;
+    color: #10b981;
+    letter-spacing: 0.6px;
+    margin-bottom: 2px;
+}
+
+.pn-nuts-note {
+    font-size: 8px;
+    line-height: 1.2;
+    color: #9da7b2;
 }
 
 /* States */

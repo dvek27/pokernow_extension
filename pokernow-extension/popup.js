@@ -131,6 +131,18 @@ function cardToDisplay(card) {
     return card[0] + suitChar;
 }
 
+function fairShareHtml(winPct, playersPlaying) {
+    const fair = 100 / Math.max(1, playersPlaying);
+    const edge = winPct - fair;
+    const edgeText = `${edge >= 0 ? '+' : ''}${edge.toFixed(1)}%`;
+    return `
+        <div class="result-fair-share ${edge >= 0 ? 'positive' : 'negative'}">
+          <span>${winPct.toFixed(1)}% vs ${fair.toFixed(1)}% fair share</span>
+          <strong>${edgeText} edge</strong>
+        </div>
+    `;
+}
+
 // ============================================================
 // DOM setup
 // ============================================================
@@ -258,6 +270,8 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             try {
                 const res = simulateOdds([h1, h2], board, opponents, 5000);
+                const playersPlaying = opponents + 1;
+                const winPct = parseFloat(res.win);
                 const street = board.length === 0 ? 'PREFLOP' :
                     board.length === 3 ? 'FLOP' :
                         board.length === 4 ? 'TURN' : 'RIVER';
@@ -290,6 +304,7 @@ document.addEventListener('DOMContentLoaded', () => {
                       <div class="result-bar-track">
                         <div class="result-bar-fill" style="width:${res.win}%"></div>
                       </div>
+                      ${fairShareHtml(winPct, playersPlaying)}
                     </div>
                 `;
             } catch (err) {
@@ -319,6 +334,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderLive(data, results) {
         const playersPlaying = data.playersPlaying || data.opponents + 1;
+        const winPct = parseFloat(results.win);
         const cardsHtml = data.holeCards.map(c => {
             const red = RED_SUITS.has(c[1]);
             return `<span class="mini-card ${red ? 'red' : 'black'}">${cardToDisplay(c)}</span>`;
@@ -359,6 +375,7 @@ document.addEventListener('DOMContentLoaded', () => {
               <div class="result-bar-track">
                 <div class="result-bar-fill" style="width:${results.win}%"></div>
               </div>
+              ${fairShareHtml(winPct, playersPlaying)}
             </div>
         `;
     }
